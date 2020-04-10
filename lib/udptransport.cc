@@ -34,6 +34,7 @@
 #include "lib/message.h"
 #include "lib/udptransport.h"
 
+#include <endian.h>
 #include <google/protobuf/message.h>
 #include <event2/event.h>
 #include <event2/thread.h>
@@ -737,8 +738,10 @@ UDPTransport::ProcessPacket(int fd, sockaddr_in sender, socklen_t senderSize,
             shardnum_t groupIdx;
             msgnum_t seqnum;
             groupIdx = *(shardnum_t *)ptr;
+            groupIdx = ntohl(groupIdx);
             ptr += sizeof(shardnum_t);
             seqnum = *(msgnum_t *)ptr;
+            seqnum = be64toh(seqnum);
             ptr += sizeof(msgnum_t);
             stamp.seqnums.insert(std::make_pair(groupIdx, seqnum));
         }
